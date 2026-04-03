@@ -34,7 +34,7 @@ venv\Scripts\activate  # Windows
 
 3. Gerekli paketleri yükleyin:
 ```bash
-pip install streamlit requests transformers python-dotenv torch
+pip install -r requirements.txt
 ```
 
 4. `.env` dosyası oluşturun ve NewsAPI anahtarınızı ekleyin:
