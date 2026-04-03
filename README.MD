@@ -59,7 +59,7 @@ Tarayıcınızda otomatik olarak açılacak olan arayüzde:
 ## Kullanılan Teknolojiler
 
 - **Streamlit**: Web arayüzü
-- **NewsAPI**: Haber kaynağ1
+- **NewsAPI**: Haber kaynağı
 - **Transformers**: Duygu analizi modeli
 - **BERT Model**: `saribasmetehan/bert-base-turkish-sentiment-analysis`
 
