@@ -11,13 +11,13 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
+@st.cache_data
 def haber_getir(konu):
     try:
         url = f"https://newsapi.org/v2/everything?q={konu}&language=tr&pageSize=10&apiKey={NEWS_API_KEY}"
         response = requests.get(url)
         return response.json()
     except Exception as e:
-        st.error(f"Haberleri getirirken bir hata oluştu: {e}")
         return None
 
 def ozet_olustur(metin):
@@ -35,16 +35,16 @@ def ozet_olustur(metin):
 def model_yukle():
     return pipeline("sentiment-analysis", model="saribasmetehan/bert-base-turkish-sentiment-analysis")
 
-st.title("Haber Duygu Analizi")
-st.write("Haberleri analiz et, duygu skorlarını gör!")
+st.title("Haber Analiz Asistanı")
+st.write("Bu uygulama, belirttiğiniz konuda Türkçe haberleri çekerek duygu analizini yapar ve sonuçları görselleştirir. Ayrıca, her haber için özet oluşturma özelliği de sunar.")
 konu = st.text_input("Hangi konuyu analız etmek istersiniz?")
 
 if konu:
     model = model_yukle()
-    st.write(f"'{konu}' konusundaki haberler aranıyor...")
-    veriler = haber_getir(konu)
-
+    with st.spinner(f"'{konu}' konusundaki haberler aranıyor..."):
+        veriler = haber_getir(konu)
     if veriler is None:
+        st.error("Haberler çekilirken bir hata oluştu.")
         st.stop()
     haberler = veriler["articles"]
     if not haberler:
@@ -57,19 +57,20 @@ if konu:
        metin = haber["description"] or haber["title"]
        sonuc = model(metin)
        sonuc_detay = sonuc[0]
-       st.write(haber["title"])
+       st.subheader(haber["title"])
        if haber["description"] is not None:
            st.write(haber["description"])
        if sonuc_detay["label"] == "LABEL_0":
-           st.write("Negatif")
+           st.error("Negatif")
            negatif_sayisi += 1
        elif sonuc_detay["label"] == "LABEL_1":
-           st.write("Pozitif")
+           st.success("Pozitif")
            pozitif_sayisi += 1
        st.write(f"Duygu Skoru(Doğruluk Yüzdesi): %{sonuc_detay["score"] * 100:.2f}")
        if st.button("Özet Oluştur", key=haber["url"]):
            ozet = ozet_olustur(metin)
            st.write(f"Özet: {ozet}")
+       st.markdown(f"[Habere Git]({haber['url']})")
        st.divider()
     st.sidebar.title("Özet:")
     st.sidebar.write(f"Toplam Haber: {len(haberler)}")
