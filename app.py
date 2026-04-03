@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import google.generativeai as genai
 from transformers import pipeline
 from dotenv import load_dotenv
+from datetime import date
 
 load_dotenv()
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
@@ -12,9 +13,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 @st.cache_data
-def haber_getir(konu):
+def haber_getir(konu,haber_sayisi,tarih):
     try:
-        url = f"https://newsapi.org/v2/everything?q={konu}&language=tr&pageSize=10&apiKey={NEWS_API_KEY}"
+        url = f"https://newsapi.org/v2/everything?q={konu}&language=tr&pageSize={haber_sayisi}&apiKey={NEWS_API_KEY}&from={tarih}"
         response = requests.get(url)
         return response.json()
     except Exception as e:
@@ -38,21 +39,25 @@ def model_yukle():
 st.title("Haber Analiz Asistanı")
 st.write("Bu uygulama, belirttiğiniz konuda Türkçe haberleri çekerek duygu analizini yapar ve sonuçları görselleştirir. Ayrıca, her haber için özet oluşturma özelliği de sunar.")
 konu = st.text_input("Hangi konuyu analız etmek istersiniz?")
+haber_sayisi = st.slider("Kaç haber görmek istiyorsunuz?", min_value=5, max_value=20, value=10)
+tarih = st.date_input("Baslangic tarihi seçin:", max_value= date.today())
 
 if konu:
     model = model_yukle()
     with st.spinner(f"'{konu}' konusundaki haberler aranıyor..."):
-        veriler = haber_getir(konu)
+        veriler = haber_getir(konu, haber_sayisi,tarih)
     if veriler is None:
         st.error("Haberler çekilirken bir hata oluştu.")
         st.stop()
     haberler = veriler["articles"]
     if not haberler:
-        st.write("Bu konuda haber bulunamadı.")
+        st.warning("Haber bulunamadı. Lütfen farklı bir konu veya tarih deneyin.")
         st.stop()
+
     pozitif_sayisi = 0
     negatif_sayisi = 0
 
+    st.info(f"{len(haberler)} haber bulundu.")
     for haber in haberler:
        metin = haber["description"] or haber["title"]
        sonuc = model(metin)
@@ -60,12 +65,14 @@ if konu:
        st.subheader(haber["title"])
        if haber["description"] is not None:
            st.write(haber["description"])
-       if sonuc_detay["label"] == "LABEL_0":
-           st.error("Negatif")
-           negatif_sayisi += 1
+       if sonuc_detay["score"] < 0.70:
+            st.warning("Belirsiz")
+       elif sonuc_detay["label"] == "LABEL_0":
+            st.error("Negatif")
+            negatif_sayisi += 1
        elif sonuc_detay["label"] == "LABEL_1":
-           st.success("Pozitif")
-           pozitif_sayisi += 1
+            st.success("Pozitif")
+            pozitif_sayisi += 1
        st.write(f"Duygu Skoru(Doğruluk Yüzdesi): %{sonuc_detay["score"] * 100:.2f}")
        if st.button("Özet Oluştur", key=haber["url"]):
            ozet = ozet_olustur(metin)
