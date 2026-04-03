@@ -4,7 +4,7 @@ Türkçe haberlerin duygu analizini yapan Streamlit tabanlı bir web uygulaması
 
 ## Özellikler
 
-- NewsAPI üzerinden gerçek zamanl1 haber arama
+- NewsAPI üzerinden gerçek zamanlı haber arama
 - BERT tabanlı Türkçe duygu analizi modeli
 - Pozitif/Negatif duygu sınıflandırması
 - Güven skoru yüzdesi
