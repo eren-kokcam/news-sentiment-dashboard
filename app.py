@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 import requests
+import plotly.graph_objects as go
 from transformers import pipeline
 from dotenv import load_dotenv
 
@@ -28,12 +29,15 @@ if konu:
     model = model_yukle()
     st.write(f"'{konu}' konusundaki haberler aranıyor...")
     veriler = haber_getir(konu)
+
     if veriler is None:
         st.stop()
     haberler = veriler["articles"]
     if not haberler:
         st.write("Bu konuda haber bulunamadı.")
         st.stop()
+    pozitif_sayisi = 0
+    negatif_sayisi = 0
 
     for haber in haberler:
        metin = haber["description"] or haber["title"]
@@ -44,7 +48,19 @@ if konu:
            st.write(haber["description"])
        if sonuc_detay["label"] == "LABEL_0":
            st.write("Negatif")
+           negatif_sayisi += 1
        elif sonuc_detay["label"] == "LABEL_1":
            st.write("Pozitif")
+           pozitif_sayisi += 1
        st.write(f"Duygu Skoru(Doğruluk Yüzdesi): %{sonuc_detay["score"] * 100:.2f}")
        st.divider()
+    st.sidebar.title("Özet:")
+    st.sidebar.write(f"Toplam Haber: {len(haberler)}")
+    st.sidebar.write(f"Pozitif Haber: {pozitif_sayisi}")
+    st.sidebar.write(f"Negatif Haber: {negatif_sayisi}")
+    fig = go.Figure(data=[go.Pie(
+        labels=["Pozitif", "Negatif"],
+        values=[pozitif_sayisi, negatif_sayisi],
+        hole=0.3
+    )])
+    st.sidebar.plotly_chart(fig)
