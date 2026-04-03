@@ -2,11 +2,14 @@ import os
 import streamlit as st
 import requests
 import plotly.graph_objects as go
+import google.generativeai as genai
 from transformers import pipeline
 from dotenv import load_dotenv
 
 load_dotenv()
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=GEMINI_API_KEY)
 
 def haber_getir(konu):
     try:
@@ -16,6 +19,17 @@ def haber_getir(konu):
     except Exception as e:
         st.error(f"Haberleri getirirken bir hata oluştu: {e}")
         return None
+
+def ozet_olustur(metin):
+    try:
+        model= genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(
+            f"Bu haberi 2 cümleyle analiz et, neden önemli olduğunu ve kimi etkilediğini belirt: {metin}"
+        )
+        return response.text
+    except Exception as e:
+        st.error(f"Özet oluştururken bir hata oluştu: {e}")
+        return "Özet oluşturulamadı."
     
 @st.cache_resource
 def model_yukle():
@@ -53,6 +67,9 @@ if konu:
            st.write("Pozitif")
            pozitif_sayisi += 1
        st.write(f"Duygu Skoru(Doğruluk Yüzdesi): %{sonuc_detay["score"] * 100:.2f}")
+       if st.button("Özet Oluştur", key=haber["url"]):
+           ozet = ozet_olustur(metin)
+           st.write(f"Özet: {ozet}")
        st.divider()
     st.sidebar.title("Özet:")
     st.sidebar.write(f"Toplam Haber: {len(haberler)}")
