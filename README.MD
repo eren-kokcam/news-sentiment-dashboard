@@ -1,14 +1,14 @@
 # Haber Duygu Analizi Dashboard
 
-T�rk�e haberlerin duygu analizini yapan Streamlit tabanl1 bir web uygulamas1.
+Türkçe haberlerin duygu analizini yapan Streamlit tabanlı bir web uygulaması.
 
-## �zellikler
+## Özellikler
 
-- NewsAPI �zerinden ger�ek zamanl1 haber arama
-- BERT tabanl1 T�rk�e duygu analizi modeli
-- Pozitif/Negatif duygu s1n1fland1rmas1
-- G�ven skoru y�zdesi
-- Kullan1c1 dostu aray�z
+- NewsAPI üzerinden gerçek zamanl1 haber arama
+- BERT tabanlı Türkçe duygu analizi modeli
+- Pozitif/Negatif duygu sınıflandırması
+- Güven skoru yüzdesi
+- Kullanıcı dostu arayüz
 
 ## Gereksinimler
 
@@ -18,13 +18,13 @@ pip install streamlit requests transformers python-dotenv torch
 
 ## Kurulum
 
-1. Repoyu klonlay1n:
+1. Repoyu klonlayın:
 ```bash
 git clone <repo-url>
 cd news-sentiment-dashboard
 ```
 
-2. Sanal ortam olu_turun ve aktif edin:
+2. Sanal ortam oluşturun ve aktif edin:
 ```bash
 python -m venv venv
 source venv/bin/activate  # macOS/Linux
@@ -32,31 +32,31 @@ source venv/bin/activate  # macOS/Linux
 venv\Scripts\activate  # Windows
 ```
 
-3. Gerekli paketleri y�kleyin:
+3. Gerekli paketleri yükleyin:
 ```bash
 pip install streamlit requests transformers python-dotenv torch
 ```
 
-4. `.env` dosyas1 olu_turun ve NewsAPI anahtar1n1z1 ekleyin:
+4. `.env` dosyası oluşturun ve NewsAPI anahtarınızı ekleyin:
 ```
 NEWS_API_KEY=your_api_key_here
 ```
 
-NewsAPI anahtar1 almak i�in: https://newsapi.org/
+NewsAPI anahtarı almak için: https://newsapi.org/
 
-## Kullan1m
+## Kullanım
 
-Uygulamay1 ba_lat1n:
+Uygulamayı başlatın:
 ```bash
 streamlit run app.py
 ```
 
-Taray1c1n1zda otomatik olarak a�1lacak olan aray�zde:
+Tarayıcınızda otomatik olarak açılacak olan arayüzde:
 1. Analiz etmek istediğiniz konuyu girin
-2. Uygulama ilgili T�rk�e haberleri �ekecek
-3. Her haber i�in duygu analizi sonu�lar1 g�r�nt�lenecek
+2. Uygulama ilgili Türkçe haberleri çekecek
+3. Her haber için duygu analizi sonuçları görüntülenecek
 
-## Kullan1lan Teknolojiler
+## Kullanılan Teknolojiler
 
 - **Streamlit**: Web arayüzü
 - **NewsAPI**: Haber kaynağ1
@@ -65,10 +65,10 @@ Taray1c1n1zda otomatik olarak a�1lacak olan aray�zde:
 
 ## Model Bilgisi
 
-Uygulama, T�rk�e metinler i�in �zel olarak eğitilmi_ BERT tabanl1 bir sentiment analysis modeli kullan1r:
+Uygulama, Türkçe metinler için özel olarak eğitilmiş BERT tabanlı bir sentiment analysis modeli kullanır:
 - Model: `saribasmetehan/bert-base-turkish-sentiment-analysis`
-- �1kt1: LABEL_0 (Negatif) veya LABEL_1 (Pozitif)
-- G�ven skoru: 0-1 aras1 (y�zde olarak g�sterilir)
+- Çıktı: LABEL_0 (Negatif) veya LABEL_1 (Pozitif)
+- Güven skoru: 0-1 arası (yüzde olarak gösterilir)
 
 ## Lisans
 
